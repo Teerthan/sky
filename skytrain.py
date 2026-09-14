@@ -21,7 +21,7 @@ def health():
 def run_web():
     web.run(
         host="0.0.0.0",
-        port=10000
+        port=8080
     )
     
 BOT_USER = "PokepiaBot"
