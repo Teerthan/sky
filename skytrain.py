@@ -1,8 +1,8 @@
 from pyrogram import Client, filters
-import asyncio
-import requests
 from flask import Flask
 from threading import Thread
+import asyncio
+import os
 
 app = Client(
     "skytrain",
@@ -12,33 +12,16 @@ app = Client(
 
 web = Flask(__name__)
 
+
 @web.route("/")
 def home():
-    return "Skytrain is running"
-
-@web.route("/health")
-def health():
     return "OK"
 
+
 def run_web():
-    web.run(
-        host="0.0.0.0",
-        port=8080
-    )
+    port = int(os.environ.get("PORT", 8080))
+    web.run(host="0.0.0.0", port=port)
 
-def uptime_ping():
-    while True:
-        try:
-            response = requests.get(
-                "https://sky-4x23.onrender.com/health",
-                timeout=10
-            )
-            print(f"Uptime ping: {response.status_code}")
-        except Exception as e:
-            print(f"Uptime ping failed: {e}")
-
-        import time
-        time.sleep(300)
 
 BOT_USER = "PokepiaBot"
 CHAT_ID = -1004265573604
@@ -53,6 +36,7 @@ button_names = {
     "/spa": "Team 5",
     "/atk": "Team 4"
 }
+
 
 async def train_function(client, message):
     text = message.text or message.caption or ""
@@ -77,9 +61,9 @@ async def train_function(client, message):
                 await msg.click(button)
                 print(f"Clicked {button}")
                 await message.reply(
-                    f"**⦿ {button_names[command]} 〔{text.replace('/', '').upper()}〕**\n"
-                    f"Send a challenge to proceed."
-                )
+    f"**⦿ {button_names[command]} 〔{text.replace('/', '').upper()}〕**\n"
+    f"Send a challenge to proceed."
+)
             except Exception as e:
                 print(f"Failed to click {button}: {e}")
 
@@ -87,14 +71,7 @@ async def train_function(client, message):
 
     if (
         "80085" in text
-        and any(
-            word in text
-            for word in [
-                "challenges",
-                "Current turn: 80085",
-                "80085's Pokemon fainted!"
-            ]
-        )
+        and any(word in text for word in ["challenges", "Current turn: 80085", "80085's Pokemon fainted!"])
         and message.reply_markup
     ):
         print("clicked")
@@ -105,12 +82,14 @@ async def train_function(client, message):
         await asyncio.sleep(sleep_time)
         await message.click(0)
 
+
 @app.on_message(
     filters.chat(CHAT_ID)
     & filters.command(["exp", "hp", "spe", "spd", "def", "spa", "atk"])
 )
 async def command_handler(client, message):
     await train_function(client, message)
+
 
 @app.on_message(
     filters.incoming
@@ -120,6 +99,7 @@ async def command_handler(client, message):
 async def new_message(client, message):
     await train_function(client, message)
 
+
 @app.on_edited_message(
     filters.incoming
     & filters.user(BOT_USER)
@@ -128,14 +108,6 @@ async def new_message(client, message):
 async def edited_message(client, message):
     await train_function(client, message)
 
-Thread(
-    target=run_web,
-    daemon=True
-).start()
 
-Thread(
-    target=uptime_ping,
-    daemon=True
-).start()
-
+Thread(target=run_web, daemon=True).start()
 app.run()
