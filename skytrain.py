@@ -89,6 +89,7 @@ async def train_function(client, message):
 )
 async def command_handler(client, message):
     await train_function(client, message)
+    print("We got a message")
 
 
 @app.on_message(
@@ -110,4 +111,5 @@ async def edited_message(client, message):
 
 
 Thread(target=run_web, daemon=True).start()
+print("Running Sky Team...")
 app.run()
