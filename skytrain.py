@@ -24,7 +24,7 @@ def run_web():
 
 
 BOT_USER = "PokepiaBot"
-CHAT_ID = -1004265573604
+CHAT_ID = [-1004265573604, -1003553495627]
 TEAM_MESSAGE_ID = 1812
 
 button_names = {
